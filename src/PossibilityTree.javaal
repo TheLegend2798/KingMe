@@ -1,0 +1,37 @@
+import java.util.ArrayList;
+
+public class PossibilityTree {
+	protected int size;
+	protected ArrayList<Node> branches;
+	protected Node root;
+	
+	public PossibilityTree(Node rt){
+		size=0;
+		root=rt;
+		branches=new ArrayList<Node>();
+	}
+	
+	public int size(){
+		return size;
+	}
+	
+	public Node getRoot() throws IllegalStateException{
+		if(root==null){throw new IllegalStateException("Empty Tree");}
+		return root;
+	}
+	
+	public void setNext(int branch,Node n){
+		branches.set(branch, n);
+	}
+	
+	public Node[] getBranch(int branch){
+		ArrayList<Node> currentBranch=new ArrayList<Node>();
+		Node next =branches.get(branch).getChild();
+		while(next!=null){
+		currentBranch.add(next);
+		next=next.getChild();
+		}
+		return (Node[]) currentBranch.toArray();
+	}
+	
+}
