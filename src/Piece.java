@@ -1,3 +1,5 @@
+ 
+
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -61,4 +63,3 @@ public abstract class Piece extends JLabel implements MouseListener,MoveablePiec
 	}
 
 }
-

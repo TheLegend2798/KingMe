@@ -1,3 +1,5 @@
+ 
+
 
 public class Validation {
 	private int oX,oY,nX,nY,typeOfPiece;
@@ -128,4 +130,3 @@ public class Validation {
 
 
 }
-

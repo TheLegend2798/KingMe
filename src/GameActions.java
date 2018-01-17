@@ -1,6 +1,8 @@
+ 
+
 
 public class GameActions {
-	
+
 	public static Piece[][] removeAt(int toDeleteX,int toDeleteY,Piece[][] allPieces){
 		Piece[][] tempPieces= new Piece[8][8];
 		for(int i=0;i<8;i++){
@@ -16,7 +18,7 @@ public class GameActions {
 		}
 		return tempPieces;
 	}
-	
+
 	public static Piece[][] moveTo(int oldX,int oldY,int newX,int newY,Piece[][] allPieces){
 		Piece[][] tempPieces;
 		Piece[][] tempFinalPieces= new Piece[8][8];

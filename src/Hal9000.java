@@ -1,7 +1,7 @@
+ 
+
 
 import java.util.ArrayList;
-
-import javax.swing.JOptionPane;
 
 public class Hal9000 {
 	private  Piece[][] currentBoard;
@@ -11,7 +11,6 @@ public class Hal9000 {
 	private  ArrayList<int[]> userMoveable;
 	private Node<Piece [][]> root ;
 	private Node<Piece [][]> currentPlan;
-	private static int numOfPieces;
 
 	public Hal9000(Piece[][] allPieces,int c,int c2){
 		myColor=c;
@@ -23,34 +22,21 @@ public class Hal9000 {
 	}
 
 	public  Piece[][] getNextMove(){
-		System.out.println("Im thinking");
 		root=new Node(currentBoard,null,0);
 		int depth=4;
-		numOfPieces=0;
 		updateMyPieces(currentBoard);
-		if(numOfPieces<6){
-			depth=8;
-		}
 		root=popul(depth,root,0,myColor,0);
-		
+
 		for(int i=0;i<root.getChildren().size();i++){
 			if(!checkIfLose(myColor, root.getChildren().get(i).getBoard())){
-				//displayBoard(root.getChildren().get(0).getBoard());
 				currentPlan=getBestOption(root);
 
-				System.out.println("Option with score "+currentPlan.getPoints());
 				ArrayList<Piece[][]> myPlan=new ArrayList<Piece[][]>();
-				//currentPlan=currentPlan.getParent();	
 				while(currentPlan.getParent().getParent()!=null){
 					myPlan.add(currentPlan.getBoard());
 					currentPlan=currentPlan.getParent();
 				}
 				myPlan.add(currentPlan.getBoard());
-				for(int j=myPlan.size()-1;j>-1;j--){
-					System.out.println(" Gen: "+(myPlan.size()-j));
-					displayBoard(myPlan.get(j));
-				}
-				
 				return myPlan.get(myPlan.size()-1);
 			}
 		}
@@ -70,7 +56,6 @@ public class Hal9000 {
 			for(int j=0;j<8;j++){
 				if(cB[i][j].getType()==myColor){
 					myPieces[i][j]=true;
-					numOfPieces++;
 				}
 				else if(cB[i][j].getType()==userColor){
 					myPieces[i][j]=false;
@@ -125,7 +110,7 @@ public class Hal9000 {
 			normalMove=-1;
 			eatMove=-2;
 		}
-		
+
 		outerloop :for(int i=0;i<8;i++){
 			for(int j=0;j<8;j++){
 				if(x[i][j]){
@@ -141,7 +126,7 @@ public class Hal9000 {
 							moveablePieces.add(new int[]{i,j,i-eatMove,j-2,1,currentUser});
 							break outerloop;
 						}		
-						
+
 						v= new Validation(i,j,i-normalMove,j+1,currentUser,currentBoard[i][j].isKing,currentBoard);
 						if(v.checkIfValid()){
 							moveablePieces.add(new int[]{i,j,i-normalMove,j+1,0,0,currentUser});
@@ -154,7 +139,7 @@ public class Hal9000 {
 
 						}
 					}
-					
+
 					Validation v= new Validation(i,j,i+eatMove,j+2,currentUser,currentBoard[i][j].isKing,currentBoard);
 					if(v.checkIfValid()){
 						moveablePieces.add(new int[]{i,j,i+eatMove,j+2,1,currentUser});
@@ -166,7 +151,7 @@ public class Hal9000 {
 						moveablePieces.add(new int[]{i,j,i+eatMove,j-2,1,currentUser});
 						break outerloop;
 					}
-						
+
 					v= new Validation(i,j,i+normalMove,j+1,currentUser,currentBoard[i][j].isKing,currentBoard);
 					if(v.checkIfValid()){
 						moveablePieces.add(new int[]{i,j,i+normalMove,j+1,0,currentUser});
@@ -176,12 +161,12 @@ public class Hal9000 {
 					if(v.checkIfValid()){
 						moveablePieces.add(new int[]{i,j,i+normalMove,j-1,0,currentUser});
 					}
-							
+
 
 				}
 			}
 		}
-		/*
+
 		boolean eatAtLeastOne=false;
 		for(int i=0;i<moveablePieces.size();i++){
 			if(moveablePieces.get(i)[4]==1){
@@ -196,27 +181,8 @@ public class Hal9000 {
 				}
 			}
 		}
-	*/
-		System.out.println("Number of possible moves for "+currentUser+" is "+moveablePieces.size());
+
 		return moveablePieces;
-	}
-
-	private void displayBoard(Piece[][] a){
-
-		for(int i=0;i<8;i++){
-			System.out.println("");
-			for(int j=0;j<8;j++){
-				if(a[i][j].getType()==myColor){
-					System.out.print(myColor);
-				}
-				else if(a[i][j].getType()==userColor){
-					System.out.print(userColor);
-				}
-				else{
-					System.out.print("-");
-				}
-			}
-		}
 	}
 
 	private Node<Piece[][]> popul(int depth,Node<Piece[][]> rt,int generations,int color,int score){
@@ -248,13 +214,7 @@ public class Hal9000 {
 
 	private ArrayList<Piece[][]> getAllPossibleBoards(Piece[][] initialBoard,boolean[][] piecePositions,int player){
 		ArrayList<Piece[][]> allBoards=new  ArrayList<Piece[][]>();
-		ArrayList<int[]> currentMoveable;
-		if(player==userColor){
-			currentMoveable=userMoveable;
-		}
-		else{
-			currentMoveable=myMoveable;
-		}
+		ArrayList<int[]> currentMoveable=findMoveable(player, initialBoard);
 		for(int i=0;i<currentMoveable.size();i++){
 			Piece[][] temp;
 			if(currentMoveable.get(i)[4]==1){
@@ -313,20 +273,20 @@ public class Hal9000 {
 		if(generation<=1){
 			score+=30*(mPiecesLost);
 			score-=25*(uPiecesLost);
-			score-=25*(uKingsDiff);	
-			score+=30*(mKingsDiff);
+			score-=45*(uKingsDiff);	
+			score+=45*(mKingsDiff);
 		}
 		else if(generation>1 && generation <3){
 			score+=15*(mPiecesLost);
 			score-=25*(uPiecesLost);
-			score-=25*(uKingsDiff);	
-			score+=15*(mKingsDiff);
+			score-=35*(uKingsDiff);	
+			score+=45*(mKingsDiff);
 		}
 		else{
 			score+=5*(mPiecesLost);
 			score-=10*(uPiecesLost);
-			score-=10*(uKingsDiff);	
-			score+=5*(mKingsDiff);
+			score-=20*(uKingsDiff);	
+			score+=20*(mKingsDiff);
 		};
 
 		if(nUPiecesAfter==0){
@@ -343,12 +303,16 @@ public class Hal9000 {
 		Node tempChild = null;
 		Node bestO=null;
 		if(root!=null &&  !root.getChildren().isEmpty() && root.getChildren().get(0)!=null){
-			tempChild=(Node<Piece[][]>) root.getChildren().get(0);
-			for(int i=0;i<root.getChildren().size();i++){
-				if(((Node<Piece[][]>) root.getChildren().get(i)).getPoints()>tempChild.getPoints()){
+			for(int i=1;i<root.getChildren().size();i++){
+				if(((Node<Piece[][]>) root.getChildren().get(i)).getPoints()>((Node<Piece[][]>) root.getChildren().get(i-1)).getPoints()){
 					tempChild=(Node) root.getChildren().get(i);
 				}
-				
+				else{
+					tempChild=(Node) root.getChildren().get(i-1);
+				}
+			}
+			if(root.getChildren().size()==1){
+				tempChild=(Node) root.getChildren().get(0);
 			}
 			bestO=getBestOption(tempChild);
 		}
